@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+:root {
+  --primary: #190a64;
+}
+
+.btn-primary {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  color: #fff;
+  background-color: var(--primary);
+}
+
+.btn-primary:hover {
+  background-color: #12084a; 
+}
+
+.text-primary {
+  color: var(--primary);
+}
+
+.bg-primary {
+  background-color: var(--primary);
+}
