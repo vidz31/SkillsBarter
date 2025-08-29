@@ -1,49 +1,54 @@
 import React, { useState } from "react";
-import logo from "../assets/logo.png"; // adjust if needed
-import profile_img from "../assets/profile_img.png"; // dummy profile pic
+import { Link } from "react-router-dom";  
+import logo from "../assets/logo.png";
+import profile_img from "../assets/profile_img.png";
 
 const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(true);
 
   return (
-    <nav className="w-full shadow-sm border-b border-gray-200 bg-white px-6 py-3 flex justify-between items-center">
+    <nav className="w-full fixed shadow-sm border-b border-gray-200 bg-white px-6 py-3 flex justify-between items-center">
       {/* Left: Logo */}
-      <div className="flex items-center gap-2">
-        <img src={logo} alt="logo" className="h-8" />
-        <span className="font-bold text-primary text-lg">SkillsBarter</span>
+      <div className="items-center gap-2">
+        <Link to="/" className="flex items-center gap-2"> 
+          <img src={logo} alt="logo" className="items-center h-8" />
+          <span className="font-bold text-primary text-lg">SkillsBarter</span>
+        </Link>
       </div>
 
       {/* Center or Right depending on login */}
       {!isLoggedIn ? (
         // ---------- BEFORE LOGIN ----------
         <>
-            <div className="flex gap-8">
-                <a href="#" className="text-gray-600 hover:text-primary transition">
-                Landing Page
-                </a>
-                <a href="#" className="text-gray-600 hover:text-primary transition">
-                Pricing & Plans
-                </a>
-                <a href="#" className="text-gray-600 hover:text-primary transition">
-                Contact & FAQ
-                </a>
-            </div>
+          <div className="flex gap-8">
+            <Link to="/" className="text-gray-600 hover:text-primary transition">
+              Landing Page
+            </Link>
+            <Link to="/pricing" className="text-gray-600 hover:text-primary transition">
+              Pricing & Plans
+            </Link>
+            <Link to="/faq" className="text-gray-600 hover:text-primary transition">
+              Contact & FAQ
+            </Link>
+          </div>
 
-            <div className="flex items-center gap-3">
-                <button
-                onClick={() => setIsLoggedIn(true)}
-                className="px-6 py-3 text-sm rounded-lg border border-gray-300 hover:bg-gray-100 transition"
-                >
-                Log In
-                </button>
-                <button
-                onClick={() => setIsLoggedIn(true)}
-                className="px-6 py-3 text-sm rounded-lg bg-primary text-white shadow-md hover:opacity-90 transition"
-                >
-                Sign Up
-                </button>
-            </div>
-            </>
+          <div className="flex items-center gap-3">
+            <Link
+              to="/login"
+              className="px-6 py-3 text-sm rounded-lg border border-gray-300 hover:bg-gray-100 transition"
+              style={{ textDecoration: 'none' }}
+            >
+              Log In
+            </Link>
+            <Link
+              to="/signup"
+              className="px-6 py-3 text-sm rounded-lg bg-primary text-white shadow-md hover:opacity-90 transition"
+              style={{ textDecoration: 'none' }}
+            >
+              Sign Up
+            </Link>
+          </div>
+        </>
       ) : (
         // ---------- AFTER LOGIN ----------
         <div className="flex items-center gap-4">
