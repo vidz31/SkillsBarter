@@ -9,7 +9,7 @@ const FAQContactPage = () => {
   return (
     <div className="bg-[#f5f5fa] min-h-screen py-12 px-6">
       {/* Title Section */}
-      <div className="max-w-6xl mx-auto text-center mb-17">
+  <div className="max-w-6xl mx-auto text-center mb-17 mt-16">
         <h2 className="text-5xl font-bold mb-4">How Can We Help You?</h2>
         <p className="text-gray-500 text-lg">
           Find answers to common questions or reach out to us directly.

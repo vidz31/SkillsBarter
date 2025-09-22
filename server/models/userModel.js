@@ -9,6 +9,13 @@ const userSchema = new mongoose.Schema({
   profileImage: { type: String },
   bio: { type: String },
   location: { type: String },
+  about: { type: String },
+  socialLinks: {
+    linkedin: { type: String },
+    twitter: { type: String },
+    website: { type: String },
+    github: { type: String }
+  },
 
   skillsOffered: [{ type: mongoose.Schema.Types.ObjectId, ref: "Skill" }],
   skillsNeeded: [{ type: mongoose.Schema.Types.ObjectId, ref: "Skill" }],

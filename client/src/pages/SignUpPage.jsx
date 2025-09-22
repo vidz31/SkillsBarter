@@ -1,9 +1,54 @@
 
+
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useAppContext } from "../context/AppContext";
+import { toast } from "react-toastify";
 
 const SignUpPage = () => {
+  const { backendUrl } = useAppContext();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [bio, setBio] = useState("");
+  const [skillsOffered, setSkillsOffered] = useState("");
+  const [skillsNeeded, setSkillsNeeded] = useState("");
   const [agreed, setAgreed] = useState(false);
+  const navigate = useNavigate();
+
+  const [error, setError] = useState(null);
+
+  const onSubmitHandler = async (e) => {
+    e.preventDefault();
+    if (!name || !email || !password || !agreed) {
+      toast.error("Please fill all required fields and agree to the terms.");
+      return;
+    }
+    setError(null);
+    try {
+      const { data } = await axios.post(`${backendUrl}/api/user/register`, {
+        name,
+        email,
+        password,
+        bio,
+        skillsOffered,
+        skillsNeeded
+      });
+      if (data.success) {
+        toast.success("Account created! Please log in.");
+        navigate("/login");
+      } else {
+        setError(data.message || "Signup failed");
+        toast.error(data.message || "Signup failed. Please try again.");
+      }
+    } catch (error) {
+      const message = error.response?.data?.message || "An error occurred. Please try again.";
+      setError(message);
+      toast.error(message);
+    }
+  };
+
   return (
     <div className="bg-[#f5f5fa] min-h-screen py-8 flex flex-col">
       <div className="max-w-2xl w-full mx-auto bg-white rounded-2xl shadow-xl px-8 py-10 flex flex-col items-center mt-3 mb-8">
@@ -20,17 +65,56 @@ const SignUpPage = () => {
 
         <div className="w-full text-center text-gray-300 text-sm my-2">OR</div>
 
-        <form className="w-full flex flex-col gap-3">
-          <input type="text" placeholder="Full Name" className="rounded-lg border border-gray-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-primary" />
-          <input type="email" placeholder="Email" className="rounded-lg border border-gray-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-primary" />
-          <input type="password" placeholder="Password" className="rounded-lg border border-gray-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-primary" />
+        <form className="w-full flex flex-col gap-3" onSubmit={onSubmitHandler}>
+          <input
+            type="text"
+            placeholder="Full Name"
+            className="rounded-lg border border-gray-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-primary"
+            value={name}
+            onChange={e => setName(e.target.value)}
+            required
+          />
+          <input
+            type="email"
+            placeholder="Email"
+            className="rounded-lg border border-gray-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-primary"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            className="rounded-lg border border-gray-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-primary"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            required
+          />
           <div className="text-gray-500 text-xs -mt-2 mb-1">Must be at least 8 characters</div>
 
           <div className="font-semibold text-base mt-2 mb-1">Your Profile Basics</div>
-          <textarea placeholder="Short Bio\nTell us about yourself and what you're passionate about" rows={2} className="rounded-lg border border-gray-200 px-4 py-3 text-base resize-vertical focus:outline-none focus:ring-2 focus:ring-primary" />
+          <textarea
+            placeholder="Short Bio\nTell us about yourself and what you're passionate about"
+            rows={2}
+            className="rounded-lg border border-gray-200 px-4 py-3 text-base resize-vertical focus:outline-none focus:ring-2 focus:ring-primary"
+            value={bio}
+            onChange={e => setBio(e.target.value)}
+          />
           <div className="text-gray-500 text-xs mb-1">Max 250 characters</div>
-          <input type="text" placeholder="Skills You Offer (e.g. Web Development, Graphic Design)" className="rounded-lg border border-gray-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-primary" />
-          <input type="text" placeholder="Skills You Need (e.g. Marketing, Video Editing)" className="rounded-lg border border-gray-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-primary" />
+          <input
+            type="text"
+            placeholder="Skills You Offer (e.g. Web Development, Graphic Design)"
+            className="rounded-lg border border-gray-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-primary"
+            value={skillsOffered}
+            onChange={e => setSkillsOffered(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="Skills You Need (e.g. Marketing, Video Editing)"
+            className="rounded-lg border border-gray-200 px-4 py-3 text-base focus:outline-none focus:ring-2 focus:ring-primary"
+            value={skillsNeeded}
+            onChange={e => setSkillsNeeded(e.target.value)}
+          />
 
           <label className="flex items-center gap-2 text-sm my-1">
             <input type="checkbox" checked={agreed} onChange={e => setAgreed(e.target.checked)} className="accent-primary" />

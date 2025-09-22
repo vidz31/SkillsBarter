@@ -2,7 +2,9 @@ import userModel from "../models/userModel.js";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
-
+function isValidEmail(email) {
+  return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);
+}
 
 // Register a new user
 const registerUser = async (req, res) => {
@@ -11,6 +13,12 @@ const registerUser = async (req, res) => {
 
     if (!name || !email || !password) {
       return res.json({ success: false, message: 'Missing Details' });
+    }
+    if (!isValidEmail(email)) {
+      return res.json({ success: false, message: 'Invalid email format' });
+    }
+    if (password.length < 6) {
+      return res.json({ success: false, message: 'Password must be at least 6 characters' });
     }
 
     // Check if user already exists
@@ -41,6 +49,7 @@ const registerUser = async (req, res) => {
       success: true,
       token,
       user: {
+        _id: user._id,
         name: user.name,
         email: user.email,
         profileImage: user.profileImage,
@@ -58,6 +67,12 @@ const registerUser = async (req, res) => {
 const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
+    if (!email || !password) {
+      return res.json({ success: false, message: 'Missing Details' });
+    }
+    if (!isValidEmail(email)) {
+      return res.json({ success: false, message: 'Invalid email format' });
+    }
     const user = await userModel.findOne({ email });
 
     if (!user) {
@@ -72,6 +87,7 @@ const loginUser = async (req, res) => {
         success: true,
         token,
         user: {
+          _id: user._id,
           name: user.name,
           email: user.email,
           profileImage: user.profileImage,
@@ -92,6 +108,9 @@ const loginUser = async (req, res) => {
 const getUserProfile = async (req, res) => {
   try {
     const { userId } = req.params;
+    if (!userId || userId.length !== 24) {
+      return res.json({ success: false, message: "Invalid userId" });
+    }
     const user = await userModel.findById(userId)
       .select('-password')
       .populate('badges')
@@ -114,14 +133,44 @@ const getUserProfile = async (req, res) => {
 // Update user profile
 const updateUserProfile = async (req, res) => {
   try {
-    const { userId } = req.params;
-    const { name, profileImage, bio, location } = req.body;
+  const { userId } = req.params;
+  const { name, profileImage, bio, location, about, socialLinks } = req.body;
+    if (!userId || userId.length !== 24) {
+      return res.json({ success: false, message: "Invalid userId" });
+    }
+
+    if (name && typeof name !== 'string') {
+      return res.json({ success: false, message: "Invalid name" });
+    }
+    if (profileImage && typeof profileImage !== 'string') {
+      return res.json({ success: false, message: "Invalid profileImage" });
+    }
+    if (bio && typeof bio !== 'string') {
+      return res.json({ success: false, message: "Invalid bio" });
+    }
+    if (location && typeof location !== 'string') {
+      return res.json({ success: false, message: "Invalid location" });
+    }
+    if (about && typeof about !== 'string') {
+      return res.json({ success: false, message: "Invalid about" });
+    }
+    if (socialLinks && typeof socialLinks !== 'object') {
+      return res.json({ success: false, message: "Invalid socialLinks" });
+    }
+
+    const updateFields = { };
+    if (name !== undefined) updateFields.name = name;
+    if (profileImage !== undefined) updateFields.profileImage = profileImage;
+    if (bio !== undefined) updateFields.bio = bio;
+    if (location !== undefined) updateFields.location = location;
+    if (about !== undefined) updateFields.about = about;
+    if (socialLinks !== undefined) updateFields.socialLinks = socialLinks;
 
     const updatedUser = await userModel.findByIdAndUpdate(
-        userId,
-        { name, profileImage, bio, location },
-        { new: true }
-      ).select("-password");
+      userId,
+      updateFields,
+      { new: true }
+    ).select("-password");
 
     res.json({ success: true, user: updatedUser });
   } catch (error) {

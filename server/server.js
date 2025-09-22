@@ -11,6 +11,8 @@ import reviewRouter from './routes/reviewRoutes.js';
 import walletRouter from './routes/walletRoutes.js';
 import notificationRouter from './routes/notificationRoutes.js';
 import exchangePreferenceRouter from './routes/exchangePreferenceRoutes.js';
+import dashboardRouter from './routes/dashboardRoutes.js';
+import profileRouter from './routes/profileRoutes.js';
 import "./models/skillModel.js";
 import "./models/badgeModel.js";
 import "./models/reviewModel.js";
@@ -33,6 +35,8 @@ app.use('/api/review', reviewRouter);
 app.use('/api/wallet', walletRouter);
 app.use('/api/notification', notificationRouter);
 app.use('/api/exchange-preference', exchangePreferenceRouter);
+app.use('/api/dashboard', dashboardRouter);
+app.use('/api/profile', profileRouter);
 
 app.get('/', (req, res) => res.send("API Working"));
 

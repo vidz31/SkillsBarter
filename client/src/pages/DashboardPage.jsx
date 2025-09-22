@@ -1,5 +1,6 @@
 import React from "react";
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { useAppContext } from "../context/AppContext";
 import AppSidebar from "../components/AppSidebar";
 import DashboardWallet from "../components/DashboardWallet";
 import DashboardQuickActions from "../components/DashboardQuickActions";
@@ -7,9 +8,49 @@ import DashboardCredibility from "../components/DashboardCredibility";
 import DashboardMatches from "../components/DashboardMatches";
 import DashboardNotifications from "../components/DashboardNotifications";
 
+
 const DashboardPage = () => {
+  const { user, setUser, token, backendUrl, setLoading, setError, setWallet, setNotifications, setCredibility, setMatches, loading } = useAppContext();
   const location = useLocation();
-  // Show dashboard widgets only on /dashboard root, otherwise render nested route
+  const navigate = useNavigate();
+
+  React.useEffect(() => {
+    // If user is undefined (still loading), do nothing
+    if (typeof user === 'undefined' || loading) return;
+    // If user is null (not logged in), redirect
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+    // Only fetch dashboard data if user._id is present and not loading
+    if (user._id) {
+      const fetchDashboard = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+          const res = await fetch(`${backendUrl}/api/dashboard/${user._id}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          const data = await res.json();
+          if (data.success && data.user) {
+            // Do NOT call setUser here to avoid infinite loop
+            if (data.wallet) setWallet(data.wallet);
+            if (data.notifications) setNotifications(data.notifications);
+            if (typeof data.credibility === 'number') setCredibility(data.credibility);
+            if (data.matches) setMatches(data.matches);
+          } else {
+            setError(data.message || "Failed to load dashboard data");
+          }
+        } catch (err) {
+          setError("Dashboard fetch error");
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchDashboard();
+    }
+  }, [user, token, backendUrl, loading, navigate, setLoading, setError, setWallet, setNotifications, setCredibility, setMatches]);
+
   const isDashboardRoot = location.pathname === "/dashboard";
   return (
     <div className="bg-[#f5f5fa] min-h-screen flex flex-col" style={{ paddingTop: '4rem' }}>

@@ -1,5 +1,5 @@
 import React from "react";
-import { Settings, Search, RefreshCw } from "lucide-react";
+import { Layers, MessageSquare, Settings } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const DashboardQuickActions = () => (
@@ -7,27 +7,30 @@ const DashboardQuickActions = () => (
     <div className="font-bold text-xl mb-2">Quick Actions</div>
 
     <Link
-      to="/manage-skills"
+      to="skill-management"
       className="flex items-center gap-3 bg-[#6d66af]/10 text-[#190a64] rounded-xl py-3 px-5 font-medium hover:bg-[#190a94]/10 transition-all shadow-md cursor-pointer"
+      relative="path"
+    >
+      <Layers size={20} />
+      Skill Management
+    </Link>
+
+    <Link
+      to="my-barters"
+      className="flex items-center gap-3 bg-[#6d66af]/10 text-[#190a64] rounded-xl py-3 px-5 font-medium hover:bg-[#190a94]/10 transition-all shadow-md cursor-pointer"
+      relative="path"
+    >
+      <MessageSquare size={20} />
+      My Barters
+    </Link>
+
+    <Link
+      to="settings"
+      className="flex items-center gap-3 bg-[#6d66af]/10 text-[#190a64] rounded-xl py-3 px-5 font-medium hover:bg-[#190a94]/10 transition-all shadow-md cursor-pointer"
+      relative="path"
     >
       <Settings size={20} />
-      Manage My Skills
-    </Link>
-
-    <Link
-      to="/request-match"
-      className="flex items-center gap-3 bg-[#6d66af]/10 text-[#190a64] rounded-xl py-3 px-5 font-medium hover:bg-[#190a94]/10 transition-all shadow-md cursor-pointer"
-    >
-      <Search size={20} />
-      Request New Match
-    </Link>
-
-    <Link
-      to="/use-barter"
-      className="flex items-center gap-3 bg-[#6d66af]/10 text-[#190a64] rounded-xl py-3 px-5 font-medium hover:bg-[#190a94]/10 transition-all shadow-md cursor-pointer"
-    >
-      <RefreshCw size={20} />
-      Use My Barter
+      Settings
     </Link>
   </div>
 );

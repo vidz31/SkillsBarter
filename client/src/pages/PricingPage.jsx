@@ -7,7 +7,7 @@ const PricingPage = () => {
   return (
     <main>
       {/* Hero */}
-      <section className="bg-[#e6f7fa] py-16 px-6 md:px-20 text-center">
+  <section className="bg-[#e6f7fa] py-16 mt-16 px-6 md:px-20 text-center">
         <h1 className="text-3xl md:text-5xl font-bold text-gray-900 mb-6">
           Unlock Your Full Potential
         </h1>

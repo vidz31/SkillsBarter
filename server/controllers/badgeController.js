@@ -4,7 +4,9 @@ import badgeModel from "../models/badgeModel.js";
 const createBadge = async (req, res) => {
   try {
     const { name, icon, description } = req.body;
-    if (!name) return res.json({ success: false, message: "Badge name required" });
+    if (!name || typeof name !== 'string') return res.json({ success: false, message: "Badge name required" });
+    if (icon && typeof icon !== 'string') return res.json({ success: false, message: "Invalid icon" });
+    if (description && typeof description !== 'string') return res.json({ success: false, message: "Invalid description" });
 
     const badge = await badgeModel.create({ name, icon, description });
     res.json({ success: true, badge });

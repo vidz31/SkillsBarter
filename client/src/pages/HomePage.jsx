@@ -7,7 +7,7 @@ import Working from "../components/Working";
 const HomePage = () => {
   return (
     <main>
-      <section className="bg-[#e6f7fa] py-16 px-6 md:px-20 text-center">
+  <section className="bg-[#e6f7fa] py-16 mt-16 px-6 md:px-20 text-center">
         {/* Heading */}
         <h1 className="text-3xl md:text-5xl font-bold text-gray-900 mb-6">
           Exchange Skills, Not Money: <br /> 
