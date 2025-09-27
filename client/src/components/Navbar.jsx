@@ -43,14 +43,8 @@ const Navbar = () => {
             <div className="absolute hidden group-hover:block top-12 right-0 bg-white shadow-lg rounded-lg w-32">
               <ul className="flex flex-col text-sm text-gray-700">
                 <li
-                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer rounded-t-lg"
-                  onClick={() => navigate("/dashboard")}
-                >
-                  Dashboard
-                </li>
-                <li
                   className="px-4 py-2 hover:bg-gray-100 cursor-pointer rounded-b-lg"
-                  onClick={logout ? logout : () => { localStorage.removeItem('token'); window.location.reload(); }}
+                  onClick={logout}
                 >
                   Logout
                 </li>

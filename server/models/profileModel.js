@@ -21,11 +21,3 @@ const profileSchema = new mongoose.Schema({
 
 const Profile = mongoose.model('Profile', profileSchema);
 export default Profile;
-
-
-
-
-
-
-
-///edit profile is not dea and check proifle contents and verything

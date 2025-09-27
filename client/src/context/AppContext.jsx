@@ -35,6 +35,14 @@ export const AppProvider = ({ children }) => {
   const [credibility, setCredibility] = useState(0);
   const [matches, setMatches] = useState([]);
 
+  // Add logout function
+  const logout = () => {
+    setUser(null);
+    setToken(null);
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+  };
+
   // Keep user and token in sync with localStorage
   useEffect(() => {
     if (user) {
@@ -105,9 +113,10 @@ export const AppProvider = ({ children }) => {
         badges, setBadges,
         wallet, setWallet,
         exchangePreferences, setExchangePreferences,
-  backendUrl: BACKEND_URL,
-  credibility, setCredibility,
-  matches, setMatches,
+        backendUrl: BACKEND_URL,
+        credibility, setCredibility,
+        matches, setMatches,
+        logout, // <-- provided here
       }}
     >
       {children}

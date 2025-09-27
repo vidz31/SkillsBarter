@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppContext } from "../context/AppContext";
@@ -28,7 +27,6 @@ const LoginPage = () => {
   // 🔹 Email/password login handler
   const onSubmitHandler = async (e) => {
     e.preventDefault();
-    console.log("Login submit clicked", { email, password, backendUrl });
     if (!email || !password) {
       toast.error("Please enter both email and password.");
       return;
@@ -37,14 +35,12 @@ const LoginPage = () => {
     setError(null);
     try {
       const { data } = await axios.post(`${backendUrl}/api/user/login`, { email, password });
-      console.log("Login API response:", data);
       if (data.success) {
         setToken(data.token);
         // Fetch user profile with token to ensure fresh data
         const userRes = await axios.get(`${backendUrl}/api/user/profile/${data.user._id}`, {
           headers: { Authorization: `Bearer ${data.token}` }
         });
-        console.log("User profile response:", userRes.data);
         setUser(userRes.data.user); // set only the user object
         localStorage.setItem("user", JSON.stringify(userRes.data.user)); // persist user object
         localStorage.setItem("token", data.token);
@@ -55,7 +51,6 @@ const LoginPage = () => {
         toast.error(data.message || "Invalid email or password. Please try again.");
       }
     } catch (error) {
-      console.error("Login error:", error);
       const message = error.response?.data?.message || "An error occurred. Please try again.";
       setError(message);
       toast.error(message);
