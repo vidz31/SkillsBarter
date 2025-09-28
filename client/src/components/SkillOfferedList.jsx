@@ -3,8 +3,24 @@ import React from "react";
 import { useAppContext } from "../context/AppContext";
 
 const SkillOfferedList = () => {
-  const { user } = useAppContext();
-  const skills = user?.skillsOffered || [];
+  const { user, token, skillsOffered, setSkillsOffered } = useAppContext();
+  const handleDelete = async (skillId) => {
+    if (!window.confirm("Delete this skill?")) return;
+    try {
+      await fetch(`/api/skill/${skillId}`, {
+        method: "DELETE",
+        headers: token ? { Authorization: `Bearer ${token}` } : {}
+      });
+      // Refresh offered skills
+      const skillsRes = await fetch(`/api/skill/user/${user._id}`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {}
+      });
+      const skillsData = await skillsRes.json();
+      setSkillsOffered(skillsData.skills || []);
+    } catch (err) {
+      alert("Failed to delete skill");
+    }
+  };
   return (
     <div>
       <h2 className="font-bold text-2xl mb-2">My Offered Skills</h2>
@@ -19,12 +35,12 @@ const SkillOfferedList = () => {
           </tr>
         </thead>
         <tbody>
-          {skills.length > 0 ? (
-            skills.map((skill, idx) => (
-              <tr key={idx}>
+          {skillsOffered.length > 0 ? (
+            skillsOffered.map((skill, idx) => (
+              <tr key={skill._id || idx}>
                 <td className="py-2">{skill.name}</td>
                 <td>
-                  <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs">{skill.proficiency || "-"}</span>
+                  <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs">{skill.level || "-"}</span>
                 </td>
                 <td>{skill.category || "-"}</td>
                 <td>
@@ -37,7 +53,7 @@ const SkillOfferedList = () => {
                   </span>
                 </td>
                 <td>
-                  <button className="text-red-500 hover:underline">🗑</button>
+                  <button className="text-red-500 hover:underline" onClick={() => handleDelete(skill._id)}>🗑</button>
                 </td>
               </tr>
             ))

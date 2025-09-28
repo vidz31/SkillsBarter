@@ -23,7 +23,7 @@ const SkillNeededList = () => {
               <tr key={idx}>
                 <td className="py-2">{skill.name}</td>
                 <td>
-                  <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs">{skill.proficiency || "-"}</span>
+                  <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs">{skill.level || "-"}</span>
                 </td>
                 <td>{skill.category || "-"}</td>
                 <td>

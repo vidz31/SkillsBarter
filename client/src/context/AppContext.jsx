@@ -83,13 +83,13 @@ export const AppProvider = ({ children }) => {
           setError('Failed to fetch user profile.');
         }
         // Only fetch other data if user is loaded
-        const notifRes = await fetch(`${BACKEND_URL}/api/notifications`, { headers });
+        const notifRes = await fetch(`${BACKEND_URL}/api/notification/user/${userId}`, { headers });
         if (notifRes.ok) setNotifications(await notifRes.json());
-        const badgeRes = await fetch(`${BACKEND_URL}/api/badges`, { headers });
+        const badgeRes = await fetch(`${BACKEND_URL}/api/badge/all`, { headers });
         if (badgeRes.ok) setBadges(await badgeRes.json());
-        const walletRes = await fetch(`${BACKEND_URL}/api/wallet`, { headers });
+        const walletRes = await fetch(`${BACKEND_URL}/api/wallet/${userId}`, { headers });
         if (walletRes.ok) setWallet(await walletRes.json());
-        const prefRes = await fetch(`${BACKEND_URL}/api/exchangePreferences`, { headers });
+        const prefRes = await fetch(`${BACKEND_URL}/api/exchange-preference/${userId}`, { headers });
         if (prefRes.ok) setExchangePreferences(await prefRes.json());
       } catch (err) {
         setError("Failed to fetch data from server.");

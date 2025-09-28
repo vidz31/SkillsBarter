@@ -66,7 +66,13 @@ const ProfileHeader = () => {
 
   return (
     <div className="flex flex-col md:flex-row items-center md:items-start gap-6 bg-white rounded-xl shadow p-6 mb-6">
-      <img src={user?.profileImage || profile_img} alt="Profile" className="w-24 h-24 rounded-full object-cover border-4 border-white shadow" />
+      <img
+        src={/^https?:\/\/example\.com\//.test(user?.profileImage || '') ? profile_img : (user?.profileImage || profile_img)}
+        alt="Profile"
+        className="w-24 h-24 rounded-full object-cover border-4 border-white shadow"
+        referrerPolicy="no-referrer"
+        onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = profile_img; }}
+      />
       <div className="flex-1">
         <div className="flex flex-col md:flex-row md:items-center gap-2 justify-between">
           <div>

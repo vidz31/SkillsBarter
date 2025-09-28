@@ -1,6 +1,7 @@
 import React from "react";
 import { User } from "lucide-react";
 import { useAppContext } from "../context/AppContext";
+import profile_img from "../assets/profile_img.png";
 
 const DashboardMatches = () => {
   const { matches } = useAppContext();
@@ -21,11 +22,13 @@ const DashboardMatches = () => {
           >
             {/* Profile section */}
             <div className="flex items-center gap-3 mb-2">
-              {match.profileImage ? (
+              {match.profileImage && !/^https?:\/\/example\.com\//.test(match.profileImage) ? (
                 <img
                   src={match.profileImage}
                   alt={match.name}
                   className="w-12 h-12 rounded-full object-cover border"
+                  referrerPolicy="no-referrer"
+                  onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = profile_img; }}
                 />
               ) : (
                 <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">

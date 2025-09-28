@@ -7,6 +7,7 @@ import DashboardQuickActions from "../components/DashboardQuickActions";
 import DashboardCredibility from "../components/DashboardCredibility";
 import DashboardMatches from "../components/DashboardMatches";
 import DashboardNotifications from "../components/DashboardNotifications";
+import Footer from "../components/Footer";
 
 
 const DashboardPage = () => {
@@ -14,16 +15,19 @@ const DashboardPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const hasFetchedRef = React.useRef(false);
+
   React.useEffect(() => {
-    // If user is undefined (still loading), do nothing
-    if (typeof user === 'undefined' || loading) return;
+    // If user is undefined (still loading initial context), do nothing
+    if (typeof user === 'undefined') return;
     // If user is null (not logged in), redirect
     if (!user) {
       navigate("/login");
       return;
     }
-    // Only fetch dashboard data if user._id is present and not loading
-    if (user._id) {
+    // Fetch once per session when user id becomes available
+    if (!hasFetchedRef.current && user._id) {
+      hasFetchedRef.current = true;
       const fetchDashboard = async () => {
         setLoading(true);
         setError(null);
@@ -33,7 +37,6 @@ const DashboardPage = () => {
           });
           const data = await res.json();
           if (data.success && data.user) {
-            // Do NOT call setUser here to avoid infinite loop
             if (data.wallet) setWallet(data.wallet);
             if (data.notifications) setNotifications(data.notifications);
             if (typeof data.credibility === 'number') setCredibility(data.credibility);
@@ -49,15 +52,15 @@ const DashboardPage = () => {
       };
       fetchDashboard();
     }
-  }, [user, token, backendUrl, loading, navigate, setLoading, setError, setWallet, setNotifications, setCredibility, setMatches]);
+  }, [user?._id, token, backendUrl, navigate]);
 
   const isDashboardRoot = location.pathname === "/dashboard";
   return (
-    <div className="bg-[#f5f5fa] min-h-screen flex flex-col" style={{ paddingTop: '4rem' }}>
+    <div className="bg-[#f5f5fa] min-h-screen flex flex-col" style={{ paddingTop: '4.5rem' }}>
       <div className="flex flex-1 min-h-0">
-        <div>
-          <AppSidebar fullHeight={false} />
-        </div>
+        {/* Fixed sidebar + layout spacer to prevent content shifting */}
+        <AppSidebar fullHeight={true} />
+        <div className="w-64 flex-none" />
         <main className="flex-1 px-4 md:px-8 py-6 space-y-8">
           {isDashboardRoot ? (
             <>
@@ -75,6 +78,10 @@ const DashboardPage = () => {
             <Outlet />
           )}
         </main>
+      </div>
+      {/* Footer aligned with content (to the right of the fixed sidebar) */}
+      <div className="pl-64">
+        <Footer />
       </div>
     </div>
   );

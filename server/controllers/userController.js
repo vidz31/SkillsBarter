@@ -10,20 +10,25 @@ function isValidEmail(email) {
 const registerUser = async (req, res) => {
   try {
     const { name, email, password, profileImage, bio, location } = req.body;
+    console.log("[REGISTER] Incoming data:", req.body);
 
     if (!name || !email || !password) {
+      console.log("[REGISTER] Missing required fields");
       return res.json({ success: false, message: 'Missing Details' });
     }
     if (!isValidEmail(email)) {
+      console.log("[REGISTER] Invalid email format:", email);
       return res.json({ success: false, message: 'Invalid email format' });
     }
     if (password.length < 6) {
+      console.log("[REGISTER] Password too short");
       return res.json({ success: false, message: 'Password must be at least 6 characters' });
     }
 
     // Check if user already exists
     const existingUser = await userModel.findOne({ email });
     if (existingUser) {
+      console.log("[REGISTER] User already exists:", email);
       return res.json({ success: false, message: 'User already exists' });
     }
 
@@ -39,9 +44,11 @@ const registerUser = async (req, res) => {
       bio,
       location
     };
+    console.log("[REGISTER] Creating user with data:", userData);
 
     const newUser = new userModel(userData);
     const user = await newUser.save();
+    console.log("[REGISTER] User saved:", user._id);
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
 
@@ -58,7 +65,7 @@ const registerUser = async (req, res) => {
       }
     });
   } catch (error) {
-    console.log(error);
+    console.log("[REGISTER] Error:", error);
     res.json({ success: false, message: error.message });
   }
 };
@@ -122,6 +129,16 @@ const getUserProfile = async (req, res) => {
     if (!user) {
       return res.json({ success: false, message: "User not found" });
     }
+
+    // Sanitize blocked placeholder avatars
+    try {
+      if (user.profileImage) {
+        const url = new URL(user.profileImage);
+        if (url.hostname === 'example.com') {
+          user.profileImage = '';
+        }
+      }
+    } catch (e) { /* ignore invalid URLs */ }
 
     res.json({ success: true, user });
   } catch (error) {

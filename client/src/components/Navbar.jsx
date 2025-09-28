@@ -1,12 +1,15 @@
 import React, { useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import logo from "../assets/logo.png";
 import profile_img from "../assets/profile_img.png";
 import { AppContext } from "../context/AppContext";
 
 const Navbar = () => {
-  const { user, wallet, logout } = useContext(AppContext);
+  const { user, wallet, logout, token } = useContext(AppContext);
   const navigate = useNavigate();
+  const location = useLocation();
+  const publicPaths = ["/", "/pricing", "/faq", "/contact", "/login", "/signup"];
+  const isPublic = publicPaths.includes(location.pathname);
 
   return (
     <nav className="w-full fixed shadow-sm border-b border-gray-200 bg-white px-6 py-3 flex justify-between items-center z-50">
@@ -18,8 +21,8 @@ const Navbar = () => {
         </Link>
       </div>
 
-      {/* Center / Right depending on login */}
-      {user ? (
+      {/* Center / Right depending on login; force public navbar on public pages */}
+      {!isPublic && user && token ? (
         // ---------- AFTER LOGIN ----------
         <div className="flex items-center gap-6">
           {/* Credits Button */}
@@ -31,14 +34,16 @@ const Navbar = () => {
           </button>
 
           {/* Greeting */}
-          <p className="text-gray-600 text-sm">Hi, {user.name}</p>
+          <p className="text-gray-600 text-sm">Hi, {user?.name || 'User'}</p>
 
           {/* Profile Dropdown */}
           <div className="relative group">
             <img
-              src={profile_img}
+              src={/^https?:\/\/example\.com\//.test(user?.profileImage || '') ? profile_img : (user?.profileImage || profile_img)}
               alt="profile"
-              className="h-10 w-10 rounded-full border border-gray-300 cursor-pointer"
+              className="h-10 w-10 rounded-full border border-gray-300 cursor-pointer object-cover"
+              referrerPolicy="no-referrer"
+              onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = profile_img; }}
             />
             <div className="absolute hidden group-hover:block top-12 right-0 bg-white shadow-lg rounded-lg w-32">
               <ul className="flex flex-col text-sm text-gray-700">

@@ -36,13 +36,24 @@ export const getDashboardData = async (req, res) => {
       credibility = Math.round((total / reviewDocs.length) * 20); // scale to 100
     }
 
-    // Suggested matches: users who offer what this user needs, and need what this user offers
-    // (Simple version: just return 4 random users except self)
-    const matches = await User.aggregate([
-      { $match: { _id: { $ne: user._id } } },
-      { $sample: { size: 4 } },
-      { $project: { name: 1, skillsOffered: 1, skillsNeeded: 1, bio: 1, profileImage: 1 } }
-    ]);
+    // Suggested matches: all real users except self (no random sampling, no static data)
+    const matches = await User.find({ _id: { $ne: user._id } })
+      .select('name skillsOffered skillsNeeded bio profileImage');
+
+    // Sanitize external placeholder avatars that may be blocked by the browser
+    const sanitizedMatches = matches.map(m => {
+      try {
+        if (m.profileImage) {
+          const url = new URL(m.profileImage);
+          if (url.hostname === 'example.com') {
+            m.profileImage = '';
+          }
+        }
+      } catch (e) {
+        // Not a valid URL; leave as-is
+      }
+      return m;
+    });
 
     res.json({
       success: true,
@@ -50,7 +61,7 @@ export const getDashboardData = async (req, res) => {
       wallet,
       notifications,
       credibility,
-      matches
+      matches: sanitizedMatches
     });
   } catch (error) {
     res.status(500).json({ success: false, message: "Dashboard fetch error", error: error.message });
