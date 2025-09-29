@@ -1,6 +1,7 @@
 import barterRequestModel from "../models/barterRequestModel.js";
 import userModel from "../models/userModel.js";
 import skillModel from "../models/skillModel.js";
+import notificationModel from "../models/notificationModel.js";
 import { sendEmail } from "../utils/email.js";
 
 // Request a barter
@@ -31,7 +32,14 @@ export const requestBarter = async (req, res) => {
       <p>Login to SkillBarter to accept or reject this request.</p>`;
     await sendEmail({ to: ownerUser.email, subject, html });
 
-    // Optionally, send notification to requester (not email, just response)
+    // Create notification for skill owner
+    const notificationMsg = `${requesterUser.name} is requesting your skill "${skill.name}" (offered) in exchange for their needed skills.`;
+    await notificationModel.create({
+      user: ownerUser._id,
+      message: notificationMsg,
+      type: "barter-request"
+    });
+
     res.json({ success: true, barter });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

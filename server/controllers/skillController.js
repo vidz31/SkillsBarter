@@ -5,12 +5,12 @@ import mongoose from "mongoose";
 // Add a new needed skill
 const addNeededSkill = async (req, res) => {
   try {
-    const { name, level, description, owner, category, status } = req.body;
+    const { name, level, description, owner, category, status, location, barterType } = req.body;
     if (!name || typeof name !== 'string') return res.json({ success: false, message: "Skill name required" });
     if (level && !["Beginner", "Intermediate", "Expert"].includes(level)) return res.json({ success: false, message: "Invalid skill level" });
     if (!owner || !mongoose.Types.ObjectId.isValid(owner)) return res.json({ success: false, message: "Invalid owner id" });
 
-    const skill = await skillModel.create({ name, level, description, owner, category, status });
+    const skill = await skillModel.create({ name, level, description, owner, category, status, location, barterType, type: "needed" });
     // Add skill to user's skillsNeeded array
     await userModel.findByIdAndUpdate(owner, { $push: { skillsNeeded: skill._id } });
     res.json({ success: true, skill });
@@ -22,12 +22,12 @@ const addNeededSkill = async (req, res) => {
 // Add a new skill
 const addSkill = async (req, res) => {
   try {
-    const { name, level, description, owner, category, status } = req.body;
+    const { name, level, description, owner, category, status, location, barterType } = req.body;
     if (!name || typeof name !== 'string') return res.json({ success: false, message: "Skill name required" });
     if (level && !["Beginner", "Intermediate", "Expert"].includes(level)) return res.json({ success: false, message: "Invalid skill level" });
     if (!owner || !mongoose.Types.ObjectId.isValid(owner)) return res.json({ success: false, message: "Invalid owner id" });
 
-    const skill = await skillModel.create({ name, level, description, owner, category, status });
+    const skill = await skillModel.create({ name, level, description, owner, category, status, location, barterType, type: "offered" });
     // Add skill to user's skillsOffered array
     await userModel.findByIdAndUpdate(owner, { $push: { skillsOffered: skill._id } });
     res.json({ success: true, skill });

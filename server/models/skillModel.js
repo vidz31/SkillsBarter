@@ -6,6 +6,9 @@ const skillSchema = new mongoose.Schema({
   category: { type: String },
   status: { type: String, default: "Available" },
   description: { type: String },
+  location: { type: String },
+  barterType: { type: String },
+  type: { type: String, enum: ["offered", "needed"], required: true },
   owner: { type: mongoose.Schema.Types.ObjectId, ref: "User" }
 });
 

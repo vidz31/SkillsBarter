@@ -37,12 +37,22 @@ const AppSidebar = ({ fullHeight = true }) => (
       </ul>
     </nav>
     <div className="mt-auto pt-8">
-      <button className="flex items-center gap-2 text-gray-500 hover:text-primary">
-        <LogOut size={18} />
-        <span>Log Out</span>
-      </button>
+      <LogoutButton />
     </div>
   </aside>
 );
+
+
+// Add LogoutButton as a separate component to use context
+import { useAppContext } from "../context/AppContext";
+const LogoutButton = () => {
+  const { logout } = useAppContext();
+  return (
+    <button className="flex items-center gap-2 text-gray-500 hover:text-primary" onClick={logout}>
+      <LogOut size={18} />
+      <span>Log Out</span>
+    </button>
+  );
+};
 
 export default AppSidebar;

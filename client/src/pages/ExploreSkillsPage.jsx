@@ -31,11 +31,10 @@ const ExploreSkillsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedFilters, setSelectedFilters] = useState({
     skillType: "All Skill Types",
-    location: "Any Location", 
+    location: "Any Location",
     rating: "Any Rating",
     barterType: "All Barter Types"
   });
-  const [featuredSkills, setFeaturedSkills] = useState([]);
   const [allSkills, setAllSkills] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -45,19 +44,13 @@ const ExploreSkillsPage = () => {
       setLoading(true);
       setError(null);
       try {
-        const [featuredRes, allRes] = await Promise.all([
-          fetch("/api/skill/featured"),
-          fetch("/api/skill/all")
-        ]);
-        if (!featuredRes.ok || !allRes.ok) throw new Error("Failed to fetch skills");
-        let featured = await featuredRes.json();
+        const allRes = await fetch("/api/skill/all");
+        if (!allRes.ok) throw new Error("Failed to fetch skills");
         let all = await allRes.json();
         // Filter out skills owned by the logged-in user
         if (user && user._id) {
-          featured = featured.filter(skill => String(skill.owner) !== String(user._id));
           all = all.filter(skill => String(skill.owner) !== String(user._id));
         }
-        setFeaturedSkills(featured);
         setAllSkills(all);
       } catch (err) {
         setError(err.message);
@@ -66,7 +59,6 @@ const ExploreSkillsPage = () => {
       }
     };
     fetchSkills();
-    // Only refetch if user._id changes
   }, [user && user._id]);
 
   const handleFilterChange = (filterType, value) => {
@@ -76,11 +68,41 @@ const ExploreSkillsPage = () => {
     }));
   };
 
+  // Filtering logic
+  const filteredSkills = allSkills.filter(skill => {
+    // Skill Type
+    if (selectedFilters.skillType !== "All Skill Types" && skill.category !== selectedFilters.skillType) {
+      return false;
+    }
+    // Location
+    if (selectedFilters.location !== "Any Location" && skill.location !== selectedFilters.location) {
+      return false;
+    }
+    // Barter Type
+    if (selectedFilters.barterType !== "All Barter Types" && skill.barterType !== selectedFilters.barterType) {
+      return false;
+    }
+    // Rating
+    if (selectedFilters.rating !== "Any Rating") {
+      const minRating = parseFloat(selectedFilters.rating);
+      if (!skill.rating || skill.rating < minRating) return false;
+    }
+    // Search term
+    if (searchTerm && !(
+      skill.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (skill.description && skill.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (skill.category && skill.category.toLowerCase().includes(searchTerm.toLowerCase()))
+    )) {
+      return false;
+    }
+    return true;
+  });
+
   const clearFilters = () => {
     setSelectedFilters({
       skillType: "All Skill Types",
       location: "Any Location",
-      rating: "Any Rating", 
+      rating: "Any Rating",
       barterType: "All Barter Types"
     });
   };
@@ -142,18 +164,6 @@ const ExploreSkillsPage = () => {
               <option>Local</option>
               <option>Online</option>
             </select>
-
-            <select
-              value={selectedFilters.rating}
-              onChange={(e) => handleFilterChange('rating', e.target.value)}
-              className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option>Any Rating</option>
-              <option>4.5+ Stars</option>
-              <option>4.0+ Stars</option>
-              <option>3.5+ Stars</option>
-            </select>
-
             <select
               value={selectedFilters.barterType}
               onChange={(e) => handleFilterChange('barterType', e.target.value)}
@@ -164,6 +174,19 @@ const ExploreSkillsPage = () => {
               <option>Time Exchange</option>
               <option>Project Collaboration</option>
             </select>
+
+            <select
+              value={selectedFilters.rating}
+              onChange={(e) => handleFilterChange('rating', e.target.value)}
+              className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option>Any Rating</option>
+              <option value="4.5">4.5+ Stars</option>
+              <option value="4.0">4.0+ Stars</option>
+              <option value="3.5">3.5+ Stars</option>
+            </select>
+
+            {/* Barter Type filter removed */}
 
             <button
               onClick={clearFilters}
@@ -181,56 +204,17 @@ const ExploreSkillsPage = () => {
           <div className="text-center py-12 text-red-500">{error}</div>
         ) : (
           <>
-            {/* Featured Skills */}
-            <div className="mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">Featured Skills</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {featuredSkills.length === 0 ? (
-                  <div className="col-span-3 text-gray-500">No featured skills found.</div>
-                ) : featuredSkills.map((skill) => (
-                  <div key={skill._id} className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow">
-                    <div className="relative">
-                      <div className="absolute top-4 right-4 bg-white px-2 py-1 rounded-full text-xs font-medium text-gray-600">
-                        {skill.category || "General"}
-                      </div>
-                    </div>
-                    <div className="p-6">
-                      <h3 className="text-xl font-semibold text-gray-900 mb-2">{skill.name}</h3>
-                      <p className="text-gray-600 text-sm mb-4">{skill.description}</p>
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-1">
-                          <Star className="text-yellow-400 fill-current" size={16} />
-                          <span className="text-sm font-medium">{skill.rating || "-"}</span>
-                          {/* <span className="text-sm text-gray-500">({skill.reviews} reviews)</span> */}
-                        </div>
-                        <div className="flex items-center gap-1 text-gray-500">
-                          <MapPin size={14} />
-                          <span className="text-sm">{skill.location || "-"}</span>
-                        </div>
-                      </div>
-                      <button
-                        className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 transition"
-                        onClick={() => handleRequestBarter(skill)}
-                        disabled={user && String(skill.owner) === String(user._id)}
-                        title={user && String(skill.owner) === String(user._id) ? "You cannot request your own skill" : "Request Barter"}
-                      >
-                        Request Barter
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            {/* Featured Skills section removed */}
 
-            {/* All Skills */}
+            {/* Filtered Skills */}
             <div>
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">All Skills ({allSkills.length})</h2>
+                <h2 className="text-2xl font-bold text-gray-900">Skills ({filteredSkills.length})</h2>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {allSkills.length === 0 ? (
+                {filteredSkills.length === 0 ? (
                   <div className="col-span-3 text-gray-500">No skills found.</div>
-                ) : allSkills.map((skill) => (
+                ) : filteredSkills.map((skill) => (
                   <div key={skill._id} className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-6">
                     <div className="flex items-start justify-between mb-4">
                       <div>
@@ -245,7 +229,6 @@ const ExploreSkillsPage = () => {
                       <div className="flex items-center gap-1">
                         <Star className="text-yellow-400 fill-current" size={16} />
                         <span className="text-sm font-medium">{skill.rating || "-"}</span>
-                        {/* <span className="text-sm text-gray-500">({skill.reviews} reviews)</span> */}
                       </div>
                       <div className="flex items-center gap-1 text-gray-500">
                         <MapPin size={14} />

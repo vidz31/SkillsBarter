@@ -25,13 +25,7 @@ const Navbar = () => {
       {!isPublic && user && token ? (
         // ---------- AFTER LOGIN ----------
         <div className="flex items-center gap-6">
-          {/* Credits Button */}
-          <button
-            className="flex items-center gap-2 bg-blue-100 py-2 px-4 rounded-full drop-shadow hover:scale-105 transition-all duration-300 cursor-pointer"
-            onClick={() => navigate("/buy")}
-          >
-            <span className="text-sm text-gray-700">Credits left: {wallet?.credits ?? 0}</span>
-          </button>
+          {/* Credits Button removed */}
 
           {/* Greeting */}
           <p className="text-gray-600 text-sm">Hi, {user?.name || 'User'}</p>

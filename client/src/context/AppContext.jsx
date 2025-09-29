@@ -76,7 +76,10 @@ export const AppProvider = ({ children }) => {
         const userRes = await fetch(`${BACKEND_URL}/api/user/profile/${userId}`, { headers });
         if (userRes.ok) {
           const userData = await userRes.json();
-          setUser(userData.user ? userData.user : userData);
+          // Always store user with _id as string (to match MongoDB)
+          const u = userData.user ? userData.user : userData;
+          if (u && u._id) u._id = String(u._id);
+          setUser(u);
           setSkillsOffered((userData.user ? userData.user : userData).skillsOffered || []);
           setSkillsNeeded((userData.user ? userData.user : userData).skillsNeeded || []);
         } else {
